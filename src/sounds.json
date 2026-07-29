@@ -1,0 +1,13 @@
+[
+  { "id": "mami", "label": "Mami", "file": "sounds/mami.mp3", "duration": 7.18, "key": "a", "accent": "#f5a524" },
+  { "id": "sort", "label": "Sort", "file": "sounds/sort.mp3", "duration": 1.28, "key": "z", "accent": "#22d3ee" },
+  { "id": "opa", "label": "Opa", "file": "sounds/opa.mp3", "duration": 4.1, "key": "e", "accent": "#fb7185" },
+  { "id": "afed", "label": "Afed", "file": "sounds/afed.mp3", "duration": 5.46, "key": "r", "accent": "#84cc16" },
+  { "id": "tabanard", "label": "Tabanard", "file": "sounds/tabanard.mp3", "duration": 1.1, "key": "q", "accent": "#a78bfa" },
+  { "id": "baignoire", "label": "Baignoire", "file": "sounds/baignoire.mp3", "duration": 1.18, "key": "s", "accent": "#fb923c" },
+  { "id": "marie-chantale", "label": "Marie-Chantale", "file": "sounds/marie-chantale.mp3", "duration": 4.96, "key": "d", "accent": "#2dd4bf" },
+  { "id": "new-super-projet", "label": "New Super Projet", "file": "sounds/new-super-projet.mp3", "duration": 5.02, "key": "f", "accent": "#e879f9" },
+  { "id": "je", "label": "Je", "file": "sounds/je.mp3", "duration": 0.91, "key": "w", "accent": "#38bdf8" },
+  { "id": "de", "label": "De", "file": "sounds/de.mp3", "duration": 0.89, "key": "x", "accent": "#facc15" },
+  { "id": "la", "label": "La", "file": "sounds/la.mp3", "duration": 0.81, "key": "c", "accent": "#34d399" }
+]
