@@ -53,12 +53,19 @@ export default function App() {
         >
           {state.status === 'error' ? (state.error ?? 'Erreur audio') : null}
         </p>
-        <p className="mt-4 text-center font-mono text-[0.6875rem] text-muted">
-          with{' '}
-          <span role="img" aria-label="coeur">
-            ❤️
-          </span>{' '}
-          by YavaDeus
+        <p className="mt-4 text-center font-mono text-[0.6875rem]">
+          <a
+            className="signature"
+            href="https://github.com/JulienMattiussi/atre-soundboard"
+            target="_blank"
+            rel="noreferrer"
+          >
+            with{' '}
+            <span role="img" aria-label="coeur">
+              ❤️
+            </span>{' '}
+            by YavaDeus
+          </a>
         </p>
       </footer>
     </div>

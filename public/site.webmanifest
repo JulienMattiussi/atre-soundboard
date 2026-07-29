@@ -1,0 +1,16 @@
+{
+  "name": "Atre Soundboard",
+  "short_name": "Atre",
+  "description": "Soundboard 100% front-end : des pads sonores à déclencher à la souris, au doigt ou au clavier.",
+  "lang": "fr-FR",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#08080b",
+  "theme_color": "#08080b",
+  "icons": [
+    { "src": "favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+    { "src": "apple-touch-icon.png", "type": "image/png", "sizes": "180x180" }
+  ]
+}

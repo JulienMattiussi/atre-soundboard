@@ -43,6 +43,17 @@ test-coverage: ## Run tests with coverage report
 sounds: ## Re-encode every source file from sounds/src/ into public/sounds/ as mono mp3
 	@node scripts/encode-sounds.mjs
 
+CHROME ?= $(shell command -v google-chrome || command -v chromium || command -v chromium-browser)
+
+.PHONY: og
+og: ## Re-render public/og.png and public/apple-touch-icon.png from scripts/*-template.html (needs Chrome)
+	@test -n "$(CHROME)" || { echo "Chrome introuvable. Passe le binaire : make og CHROME=/chemin/vers/chrome"; exit 1; }
+	@"$(CHROME)" --headless --disable-gpu --hide-scrollbars --force-device-scale-factor=1 \
+		--window-size=1200,630 --screenshot=public/og.png scripts/og-template.html 2>/dev/null
+	@"$(CHROME)" --headless --disable-gpu --hide-scrollbars --force-device-scale-factor=1 \
+		--window-size=180,180 --screenshot=public/apple-touch-icon.png scripts/icon-template.html 2>/dev/null
+	@echo "public/og.png (1200x630) et public/apple-touch-icon.png (180x180) regeneres"
+
 fix: format lint ## Format and lint all code
 
 check: build lint typecheck knip test ## Run all checks (build, lint, typecheck, knip, tests)

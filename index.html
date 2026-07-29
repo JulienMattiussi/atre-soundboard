@@ -2,16 +2,67 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#08080b" />
 
-    <title>Atre Soundboard</title>
-    <meta name="author" content="YavaDeus" />
+    <title>Atre Soundboard - pads sonores à jouer au clavier</title>
     <meta
       name="description"
-      content="Soundboard 100% front-end : une grille de pads déclenchés à la souris, au doigt ou au clavier."
+      content="Soundboard 100% front-end : 8 pads sonores à déclencher à la souris, au doigt ou au clavier. Le pad se remplit pendant la lecture, un second appui coupe le son."
     />
+    <meta name="author" content="YavaDeus" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="%SITE_URL%/" />
+
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+    <link rel="manifest" href="site.webmanifest" />
+    <meta name="theme-color" content="#08080b" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="apple-mobile-web-app-title" content="Atre" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Atre Soundboard" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:title" content="Atre Soundboard - pads sonores à jouer au clavier" />
+    <meta
+      property="og:description"
+      content="8 pads sonores à déclencher à la souris, au doigt ou au clavier. Le pad se remplit pendant la lecture, un second appui coupe le son."
+    />
+    <meta property="og:url" content="%SITE_URL%/" />
+    <meta property="og:image" content="%SITE_URL%/og.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="La soundboard Atre : une grille de pads colorés, dont deux en cours de lecture."
+    />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Atre Soundboard - pads sonores à jouer au clavier" />
+    <meta
+      name="twitter:description"
+      content="8 pads sonores à déclencher à la souris, au doigt ou au clavier. Un second appui coupe le son."
+    />
+    <meta name="twitter:image" content="%SITE_URL%/og.png" />
+
+    <link rel="preload" as="image" href="atre.png" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Atre Soundboard",
+        "url": "%SITE_URL%/",
+        "applicationCategory": "MultimediaApplication",
+        "operatingSystem": "Tout navigateur web",
+        "inLanguage": "fr-FR",
+        "description": "Soundboard 100% front-end : des pads sonores à déclencher à la souris, au doigt ou au clavier.",
+        "screenshot": "%SITE_URL%/og.png",
+        "author": { "@type": "Person", "name": "YavaDeus" },
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

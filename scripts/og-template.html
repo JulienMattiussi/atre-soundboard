@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Gabarit Open Graph</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        background-color: #08080b;
+        background-image: radial-gradient(70% 60% at 50% -10%, #1f1f30 0%, transparent 65%);
+        color: #eaeaf2;
+        font-family: ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 64px 72px;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        gap: 32px;
+      }
+      header img.mark {
+        width: 132px;
+        height: 132px;
+      }
+      header img.logo {
+        height: 132px;
+        width: auto;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+      }
+      .pad {
+        position: relative;
+        height: 176px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        border: 2px solid color-mix(in oklab, var(--accent) 34%, transparent);
+        border-radius: 20px;
+        background-color: #14141b;
+        background-image: radial-gradient(
+          130% 110% at 50% 0%,
+          color-mix(in oklab, var(--accent) 14%, transparent),
+          transparent 68%
+        );
+      }
+      .pad.on {
+        border-color: var(--accent);
+        background-color: color-mix(in oklab, var(--accent) 8%, #14141b);
+        box-shadow:
+          0 0 0 2px color-mix(in oklab, var(--accent) 35%, transparent),
+          0 22px 60px -18px color-mix(in oklab, var(--accent) 60%, transparent);
+      }
+      .fill {
+        position: absolute;
+        inset: 0 auto 0 0;
+        border-right: 3px solid color-mix(in oklab, var(--accent) 85%, transparent);
+        background-color: color-mix(in oklab, var(--accent) 26%, transparent);
+      }
+      .label {
+        position: relative;
+        font-size: 34px;
+        font-weight: 650;
+        letter-spacing: -0.01em;
+      }
+      .dur {
+        position: relative;
+        font-family: ui-monospace, 'JetBrains Mono', Menlo, monospace;
+        font-size: 15px;
+        letter-spacing: 0.05em;
+        color: #7c7c91;
+      }
+      .keycap {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        min-width: 30px;
+        padding: 2px 7px;
+        border: 2px solid #272733;
+        border-radius: 8px;
+        background-color: rgb(8 8 11 / 0.55);
+        color: #7c7c91;
+        font-family: ui-monospace, 'JetBrains Mono', Menlo, monospace;
+        font-size: 15px;
+        text-align: center;
+      }
+      .pad.on .keycap {
+        border-color: color-mix(in oklab, var(--accent) 55%, transparent);
+        color: var(--accent);
+      }
+      footer {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        font-family: ui-monospace, 'JetBrains Mono', Menlo, monospace;
+      }
+      footer .claim {
+        font-size: 26px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: #eaeaf2;
+      }
+      footer .meta {
+        font-size: 20px;
+        letter-spacing: 0.08em;
+        color: #7c7c91;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img class="mark" src="../public/favicon.svg" alt="" />
+      <img class="logo" src="../public/atre.png" alt="" />
+    </header>
+
+    <div class="grid">
+      <div class="pad on" style="--accent: #f5a524">
+        <span class="fill" style="width: 42%"></span>
+        <span class="keycap">M</span>
+        <span class="label">MAMI</span>
+        <span class="dur">0:07</span>
+      </div>
+      <div class="pad" style="--accent: #fb7185">
+        <span class="keycap">O</span>
+        <span class="label">OPA</span>
+        <span class="dur">0:04</span>
+      </div>
+      <div class="pad on" style="--accent: #84cc16">
+        <span class="fill" style="width: 68%"></span>
+        <span class="keycap">A</span>
+        <span class="label">AFED</span>
+        <span class="dur">0:05</span>
+      </div>
+      <div class="pad" style="--accent: #22d3ee">
+        <span class="keycap">E</span>
+        <span class="label">EMAC</span>
+        <span class="dur">0:11</span>
+      </div>
+    </div>
+
+    <footer>
+      <span class="claim">Soundboard</span>
+      <span class="meta">8 sons - souris, doigt ou clavier</span>
+    </footer>
+  </body>
+</html>

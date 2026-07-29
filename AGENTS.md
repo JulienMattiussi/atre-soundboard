@@ -46,12 +46,20 @@ Zéro dépendance runtime en dehors de React.
 ```
 public/
 ├── atre.png                  # Logo, sert de titre de page
-├── favicon.svg               # Haut-parleur dans l'orange du logo (#fa471c)
+├── favicon.svg               # Enceinte de face, dans l'orange du logo (#fa471c)
+├── og.png                    # Carte Open Graph 1200x630 (générée, versionnée)
+├── apple-touch-icon.png      # 180x180 rastérisé depuis favicon.svg (générée)
+├── robots.txt
+├── site.webmanifest
 └── sounds/                   # mp3 servis par le CDN (versionnés, générés)
 sounds/
 └── src/                      # Fichiers d'origine (ogg / wav / mp3), source de vérité
+docs/
+└── screenshot.png            # Capture pour le README
 scripts/
-└── encode-sounds.mjs         # sounds/src/ -> public/sounds/ + src/sounds.json
+├── encode-sounds.mjs         # sounds/src/ -> public/sounds/ + src/sounds.json
+├── og-template.html          # Gabarit de og.png (chemins relatifs, ouvrable en file://)
+└── icon-template.html        # Gabarit de apple-touch-icon.png
 src/
 ├── audio/
 │   └── engine.ts             # SoundboardEngine : contexte, décodage, voix, volume
@@ -152,6 +160,24 @@ connaître avant d'y toucher :
   icône barrée 4, flash d'impact 5. Le voile est un `::after` du pad, donc peint
   après ses enfants de même z-index.
 
+### Référencement et carte Open Graph
+
+- **Les crawlers refusent les `og:image` relatives.** `index.html` porte donc des
+  jetons `%SITE_URL%` (canonique, `og:url`, `og:image`, JSON-LD) résolus au build
+  par le plugin `inject-site-url` de `vite.config.ts`. Il lit `SITE_URL`, sinon
+  `VERCEL_PROJECT_PRODUCTION_URL`, sinon retombe sur `localhost`. Ne pas écrire
+  d'URL absolue en dur dans `index.html`.
+- **`public/og.png` est généré mais versionné**, comme les mp3 : Vercel ne peut
+  pas le rendre au build. `make og` le régénère depuis
+  `scripts/og-template.html` avec le Chrome local (`--screenshot`). Le gabarit
+  référence ses images en relatif (`../public/...`) pour rester ouvrable en
+  `file://`, donc sans serveur de dev. Même chose pour `apple-touch-icon.png`,
+  nécessaire parce que iOS ignore les favicons SVG.
+- **Après un changement de branding ou de sons**, relancer `make og` et penser à
+  la capture `docs/screenshot.png` du README, qui n'est pas automatisée.
+- Les données structurées sont un `WebApplication` schema.org inline. Si tu y
+  touches, vérifie que le JSON reste valide : personne ne le compile.
+
 ### Pourquoi tout est en mp3 mono
 
 Safari et iOS ne lisent ni l'Ogg Vorbis ni le WebM. Les sources peuvent être dans
@@ -235,6 +261,7 @@ tout de suite, pas produire un pad muet.
 | `make start` | Serveur de dev (http://localhost:5050) |
 | `make build` | Build de production |
 | `make sounds` | Réencode `sounds/src/` en mp3 et régénère le manifest |
+| `make og` | Régénère `og.png` et `apple-touch-icon.png` (nécessite Chrome) |
 | `make lint` | ESLint |
 | `make knip` | Détecte fichiers / exports / dépendances inutilisés |
 | `make format` | Formate avec Prettier |

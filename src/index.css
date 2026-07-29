@@ -53,6 +53,21 @@
     height: var(--brand-size);
   }
 
+  .signature {
+    color: var(--color-muted);
+    text-decoration-color: transparent;
+    text-decoration-line: underline;
+    text-underline-offset: 0.25em;
+    transition:
+      color 150ms ease,
+      text-decoration-color 150ms ease;
+  }
+
+  .signature:hover {
+    color: var(--color-ink);
+    text-decoration-color: currentColor;
+  }
+
   .pad {
     position: relative;
     display: flex;
