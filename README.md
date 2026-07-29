@@ -40,20 +40,6 @@ Le pad se remplit de sa couleur pendant toute la durée de l'échantillon.
   `aria-pressed`, l'information n'est jamais portée par la seule couleur, et
   `prefers-reduced-motion` neutralise flash et remplissage.
 
-## Les sons
-
-| Pad | Touche | Durée |
-|---|---|---|
-| MAMI | <kbd>M</kbd> | 0:07 |
-| OPA | <kbd>O</kbd> | 0:04 |
-| AFED | <kbd>A</kbd> | 0:05 |
-| EMAC | <kbd>E</kbd> | 0:11 |
-| Projet | <kbd>J</kbd> | 0:36 |
-| EMADOR | <kbd>D</kbd> | 0:05 |
-| Predator | <kbd>P</kbd> | 0:06 |
-| Replay | <kbd>R</kbd> | 0:07 |
-| *tout couper* | <kbd>Espace</kbd> | |
-
 ## Démarrer
 
 ```bash
