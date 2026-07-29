@@ -14,6 +14,8 @@ class FakeBufferSource {
   }
 }
 
+let decodeDelay = 0
+
 class FakeAudioContext {
   state = 'running'
   currentTime = 0
@@ -25,7 +27,8 @@ class FakeAudioContext {
     return new FakeBufferSource()
   }
   decodeAudioData() {
-    return Promise.resolve({})
+    if (decodeDelay === 0) return Promise.resolve({})
+    return new Promise((resolve) => setTimeout(() => resolve({}), decodeDelay))
   }
   resume() {
     return Promise.resolve()
@@ -36,6 +39,7 @@ class FakeAudioContext {
 }
 
 beforeEach(() => {
+  decodeDelay = 0
   vi.stubGlobal('AudioContext', FakeAudioContext)
   vi.stubGlobal('fetch', () =>
     Promise.resolve({ ok: true, arrayBuffer: () => Promise.resolve(new ArrayBuffer(8)) }),
@@ -51,57 +55,101 @@ function padFor(label: string) {
 }
 
 describe('App', () => {
-  it('renders one pad per sound, with its keyboard shortcut', () => {
+  it('renders one pad per sound, keyed on the first letter of its label', () => {
     render(<App />)
-    expect(padFor('Mami')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Jouer Mami, touche A/ })).toBeInTheDocument()
-    expect(screen.getAllByRole('button', { name: /^Jouer / })).toHaveLength(11)
+    expect(screen.getAllByRole('button', { name: /^Jouer / })).toHaveLength(8)
+    for (const [label, key] of [
+      ['MAMI', 'M'],
+      ['EMADOR', 'D'],
+      ['OPA', 'O'],
+      ['AFED', 'A'],
+      ['EMAC', 'E'],
+      ['Projet', 'J'],
+      ['Predator', 'P'],
+      ['Replay', 'R'],
+    ]) {
+      expect(padFor(label as string)).toHaveAccessibleName(`Jouer ${label}, touche ${key}`)
+    }
   })
 
   it('marks a pad as playing when clicked', async () => {
     const user = userEvent.setup()
     render(<App />)
 
-    await user.click(padFor('Mami'))
+    await user.click(padFor('MAMI'))
 
-    await waitFor(() => expect(padFor('Mami')).toHaveAttribute('data-playing'))
-    expect(padFor('Sort')).not.toHaveAttribute('data-playing')
+    await waitFor(() => expect(padFor('MAMI')).toHaveAttribute('data-playing'))
+    expect(padFor('MAMI')).toHaveAttribute('aria-pressed', 'true')
+    expect(padFor('OPA')).not.toHaveAttribute('data-playing')
   })
 
   it('triggers a pad from its keyboard shortcut', async () => {
     const user = userEvent.setup()
     render(<App />)
 
-    await user.keyboard('z')
+    await user.keyboard('o')
 
-    await waitFor(() => expect(padFor('Sort')).toHaveAttribute('data-playing'))
+    await waitFor(() => expect(padFor('OPA')).toHaveAttribute('data-playing'))
   })
 
-  it('stacks a sound on itself and counts the voices', async () => {
+  it('stops the sound on a second press instead of stacking a second voice', async () => {
     const user = userEvent.setup()
     render(<App />)
 
-    await user.click(padFor('Mami'))
-    await waitFor(() => expect(padFor('Mami')).toHaveAttribute('data-playing'))
-    await user.click(padFor('Mami'))
+    await user.click(padFor('MAMI'))
+    await waitFor(() => expect(padFor('MAMI')).toHaveAttribute('data-playing'))
 
-    await waitFor(() => expect(padFor('Mami')).toHaveTextContent('×2'))
+    await user.click(padFor('MAMI'))
+
+    await waitFor(() => expect(padFor('MAMI')).not.toHaveAttribute('data-playing'))
+    expect(screen.getByRole('button', { name: /tout couper/i })).toBeDisabled()
+  })
+
+  it('keeps a trigger fired while the sounds are still decoding', async () => {
+    decodeDelay = 60
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(padFor('Projet'))
+    await user.click(padFor('MAMI'))
+
+    await waitFor(() => {
+      expect(padFor('Projet')).toHaveAttribute('data-playing')
+      expect(padFor('MAMI')).toHaveAttribute('data-playing')
+    })
+  })
+
+  it('toggles each pad independently', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.click(padFor('MAMI'))
+    await user.click(padFor('OPA'))
+    await waitFor(() => {
+      expect(padFor('MAMI')).toHaveAttribute('data-playing')
+      expect(padFor('OPA')).toHaveAttribute('data-playing')
+    })
+
+    await user.click(padFor('MAMI'))
+
+    await waitFor(() => expect(padFor('MAMI')).not.toHaveAttribute('data-playing'))
+    expect(padFor('OPA')).toHaveAttribute('data-playing')
   })
 
   it('cuts every voice with the stop button', async () => {
     const user = userEvent.setup()
     render(<App />)
 
-    await user.click(padFor('Mami'))
-    await user.click(padFor('Sort'))
-    const stop = screen.getByRole('button', { name: /stop/i })
+    await user.click(padFor('MAMI'))
+    await user.click(padFor('AFED'))
+    const stop = screen.getByRole('button', { name: /tout couper/i })
     await waitFor(() => expect(stop).toBeEnabled())
 
     await user.click(stop)
 
     await waitFor(() => {
-      expect(padFor('Mami')).not.toHaveAttribute('data-playing')
-      expect(padFor('Sort')).not.toHaveAttribute('data-playing')
+      expect(padFor('MAMI')).not.toHaveAttribute('data-playing')
+      expect(padFor('AFED')).not.toHaveAttribute('data-playing')
     })
     expect(stop).toBeDisabled()
   })
@@ -110,11 +158,11 @@ describe('App', () => {
     const user = userEvent.setup()
     render(<App />)
 
-    await user.click(padFor('Mami'))
-    await waitFor(() => expect(padFor('Mami')).toHaveAttribute('data-playing'))
+    await user.click(padFor('MAMI'))
+    await waitFor(() => expect(padFor('MAMI')).toHaveAttribute('data-playing'))
 
     await user.keyboard('[Space]')
 
-    await waitFor(() => expect(padFor('Mami')).not.toHaveAttribute('data-playing'))
+    await waitFor(() => expect(padFor('MAMI')).not.toHaveAttribute('data-playing'))
   })
 })

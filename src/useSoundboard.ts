@@ -16,7 +16,7 @@ export function useSoundboard(sounds: readonly Sound[]) {
   const trigger = useCallback(
     async (id: string) => {
       if (engine.getState().status !== 'ready') await engine.unlock()
-      engine.play(id)
+      engine.toggle(id)
     },
     [engine],
   )
@@ -55,10 +55,10 @@ export function useSoundboard(sounds: readonly Sound[]) {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [keyMap, stopAll, trigger])
 
-  const activeVoices = useMemo(
-    () => Object.values(state.voices).reduce((total, count) => total + count, 0),
+  const playingCount = useMemo(
+    () => Object.values(state.voices).filter((count) => count > 0).length,
     [state.voices],
   )
 
-  return { state, trigger, stopAll, volume, setVolume, activeVoices }
+  return { state, trigger, stopAll, volume, setVolume, playingCount }
 }

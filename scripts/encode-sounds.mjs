@@ -8,7 +8,16 @@ const run = promisify(execFile)
 const SOURCE_DIR = 'sounds/src'
 const OUTPUT_DIR = 'public/sounds'
 const MANIFEST = 'src/sounds.json'
-const AUDIO_EXTENSIONS = new Set(['.mp3', '.ogg', '.wav', '.opus', '.m4a', '.flac', '.aac'])
+const AUDIO_EXTENSIONS = new Set([
+  '.mp3',
+  '.ogg',
+  '.wav',
+  '.opus',
+  '.m4a',
+  '.flac',
+  '.aac',
+  '.webm',
+])
 const ACCENTS = [
   '#f5a524',
   '#22d3ee',
@@ -22,7 +31,7 @@ const ACCENTS = [
   '#facc15',
   '#34d399',
 ]
-const KEYS = [...'azerqsdfwxcvghbnty']
+const FALLBACK_KEYS = [...'azerqsdfwxcvghbnjkluiopmt']
 
 async function main() {
   await mkdir(OUTPUT_DIR, { recursive: true })
@@ -35,8 +44,10 @@ async function main() {
     console.error(`Aucun fichier audio dans ${SOURCE_DIR}/`)
     process.exit(1)
   }
-  if (entries.length > KEYS.length) {
-    console.error(`${entries.length} sons pour seulement ${KEYS.length} touches disponibles.`)
+  if (entries.length > FALLBACK_KEYS.length) {
+    console.error(
+      `${entries.length} sons pour seulement ${FALLBACK_KEYS.length} touches disponibles.`,
+    )
     process.exit(1)
   }
 
@@ -77,17 +88,17 @@ async function main() {
     ordered.map((id) => existing.get(id)?.key).filter((key) => key !== undefined),
   )
   const takenAccents = ordered.map((id) => existing.get(id)?.accent)
-  const freeKeys = KEYS.filter((key) => !takenKeys.has(key))
   const freeAccents = ACCENTS.filter((accent) => !takenAccents.includes(accent))
 
   const sounds = ordered.map((id, index) => {
     const previous = existing.get(id)
+    const label = previous?.label ?? titleize(id)
     return {
       id,
-      label: previous?.label ?? titleize(id),
+      label,
       file: `sounds/${id}.mp3`,
       duration: encoded.get(id),
-      key: previous?.key ?? freeKeys.shift(),
+      key: previous?.key ?? claimKey(label, takenKeys),
       accent: previous?.accent ?? freeAccents[index % freeAccents.length] ?? ACCENTS[0],
     }
   })
@@ -103,6 +114,16 @@ async function main() {
   console.log(
     `\n${sounds.length} sons encodés, ${MANIFEST} mis à jour${added > 0 ? ` (${added} nouveau(x))` : ''}.`,
   )
+}
+
+function claimKey(label, taken) {
+  for (const key of [slugify(label).charAt(0), ...FALLBACK_KEYS]) {
+    if (/^[a-z0-9]$/.test(key) && !taken.has(key)) {
+      taken.add(key)
+      return key
+    }
+  }
+  return undefined
 }
 
 function formatManifest(sounds) {

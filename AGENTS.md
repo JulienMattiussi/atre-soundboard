@@ -1,17 +1,22 @@
 # atre-soundboard
 
 Application **100% front-end** : une **grille de pads** déclenche des échantillons
-audio courts, à la souris, au doigt ou au clavier. Chaque pad porte une couleur
-d'accent, une touche, et **montre le son en train de jouer** (flash à l'impact,
-barre de progression sur son bord bas, compteur quand le son se superpose à
-lui-même). Interface en **français**. Partage la stack et les conventions de
-`hidden-word`.
+audio, à la souris, au doigt ou au clavier. Chaque pad porte une couleur
+d'accent, une touche, et **montre le son en train de jouer** : flash à l'impact,
+puis le pad **se remplit** de sa couleur d'accent sur toute sa hauteur, de gauche
+à droite, pendant la durée exacte de l'échantillon. Interface en **français**.
+Partage la stack et les conventions de `hidden-word`.
 
 Le point clé : la lecture passe par la **Web Audio API**, pas par des balises
 `<audio>`. Les balises introduisent une latence au déclenchement et ne savent pas
-superposer deux lectures du même fichier. Ici chaque mp3 est décodé **une fois**
+relancer proprement un son déjà en cours. Ici chaque mp3 est décodé **une fois**
 en `AudioBuffer`, puis chaque déclenchement crée un `AudioBufferSourceNode`
-jetable : instantané, et empilable autant de fois qu'on appuie.
+jetable : instantané.
+
+Chaque pad est un **interrupteur** : un appui lance le son, un second l'arrête.
+Le moteur sait empiler plusieurs voix sur un même son (`playing` est un `Set` par
+identifiant), mais `toggle()` ne l'exploite pas. Si un jour on veut la
+superposition, c'est `toggle` qu'il faut changer, pas le moteur.
 
 Hébergement visé : **Vercel Hobby**. Aucune Function, aucune base, aucun secret.
 Les mp3 sont des assets statiques servis par le CDN, ce qui garde le coût à zéro.
@@ -40,7 +45,8 @@ Zéro dépendance runtime en dehors de React.
 
 ```
 public/
-├── favicon.svg               # Grille de pads 3x3
+├── atre.png                  # Logo, sert de titre de page
+├── favicon.svg               # Haut-parleur dans l'orange du logo (#fa471c)
 └── sounds/                   # mp3 servis par le CDN (versionnés, générés)
 sounds/
 └── src/                      # Fichiers d'origine (ogg / wav / mp3), source de vérité
@@ -80,6 +86,12 @@ connaître avant d'y toucher :
   geste), et `unlock()` crée le contexte puis décode, appelé depuis le premier
   clic ou la première touche. Résultat : au premier appui les octets sont déjà
   là, il ne reste que le décodage.
+- **`unlock()` mémoïse sa promesse** dans `unlocking`. Sans ça, un second appui
+  pendant le décodage initial voyait `this.ctx` déjà rempli, rendait la main tout
+  de suite, et appelait `play()` sur un `buffers` encore vide : le son était
+  perdu silencieusement. Les appels concurrents doivent attendre le **même**
+  décodage. Couvert par le test « keeps a trigger fired while the sounds are
+  still decoding ».
 - **`trigger()` débloque avant de jouer.** Le tout premier déclenchement attend
   le décodage au lieu d'être avalé, donc le premier clic produit bien un son.
 - **`decodeAudioData` neutralise l'`ArrayBuffer`** qu'on lui passe. On décode
@@ -91,9 +103,12 @@ connaître avant d'y toucher :
 - **`triggers` est un compteur strictement croissant par son.** Il sert de clé
   React sur les éléments animés : une nouvelle clé remonte l'élément, donc les
   animations CSS repartent de zéro même si le pad jouait déjà.
-- **La progression est du CSS pur.** `animation: pad-progress var(--duration)`,
-  la durée venant du manifest. Aucun `requestAnimationFrame`, aucun rerender par
-  frame : 11 pads qui jouent en même temps ne coûtent rien.
+- **La progression est du CSS pur.** `animation: pad-progress var(--duration)`
+  fait passer la largeur de 0 à 100% sur un élément pleine hauteur, la durée
+  venant du manifest. Aucun `requestAnimationFrame`, aucun rerender par frame :
+  tous les pads peuvent jouer en même temps sans rien coûter. Corollaire : la
+  durée du manifest doit correspondre au fichier, sinon le remplissage se
+  désynchronise du son. C'est `make sounds` qui garantit ça.
 - **`dispose()` vide `buffers`.** Les `AudioBuffer` appartiennent au contexte
   fermé ; les réutiliser sur un nouveau contexte est indéfini. Le double montage
   de `StrictMode` passe donc par un vrai redécodage. Le garde `this.ctx !== ctx`
@@ -105,8 +120,11 @@ connaître avant d'y toucher :
 
 ### Clavier
 
-- **Chaque pad a sa touche** (disposition AZERTY, `event.key` et non `event.code`
-  pour coller à ce qui est imprimé sur les keycaps).
+- **Chaque pad a sa touche**, écrite en dur dans le manifest. Convention : la
+  **première lettre du label** (MAMI -> M, OPA -> O). `make sounds` applique cette
+  règle aux nouveaux sons et retombe sur une lettre libre en cas de collision.
+- On lit `event.key` et non `event.code`, pour coller à ce qui est imprimé sur les
+  keycaps d'un clavier AZERTY.
 - **Espace coupe tout**, toujours, globalement. Un pad qui a le focus ne réagit
   donc qu'à **Entrée** : sans ça, Espace sur un pad focalisé le rejouerait au lieu
   de couper, en contradiction avec le raccourci annoncé. Le `preventDefault()` du
@@ -114,12 +132,33 @@ connaître avant d'y toucher :
 - Le handler global ignore `event.repeat` (garder une touche enfoncée ne mitraille
   pas) et laisse passer les combinaisons avec Ctrl / Cmd / Alt.
 
+### Interface
+
+- **`--brand-size`** (`index.css`, layer base) donne sa taille à l'icône, au logo
+  et au bouton stop : 3,5rem en mobile, 6rem à partir de 40rem. C'est ce jeton
+  seul qui garantit leur alignement, ne pas le contourner en dur.
+- **Le bouton stop est un carré** de `--brand-size`, construit comme un pad :
+  keycap `Espace` en haut à droite, libellé centré, compteur de voix en bas à
+  droite. Les deux badges sont en `position: absolute` pour que le libellé reste
+  centré quel que soit le compteur.
+- **Les raccourcis clavier sont masqués sous 40rem** (pads et bouton stop) : pas
+  de clavier sur téléphone, et ça libère la place dans un carré de 56px.
+- **Survol d'un pad en lecture** : un voile sombre plus une grosse icône de
+  haut-parleur barré annoncent que le clic va couper. Le tout est derrière
+  `@media (hover: hover)`, donc absent sur tactile où il n'aurait aucun sens.
+  Attention en test automatisé : Chrome headless rapporte `hover: none`, ce bloc
+  n'y est jamais évalué sans forcer `--blink-settings=availableHoverTypes=2`.
+- **Ordre de superposition dans un pad** : remplissage 0, textes 2, voile 3,
+  icône barrée 4, flash d'impact 5. Le voile est un `::after` du pad, donc peint
+  après ses enfants de même z-index.
+
 ### Pourquoi tout est en mp3 mono
 
-Safari et iOS ne lisent pas l'Ogg Vorbis. Les sources peuvent être dans
-n'importe quel format ; `make sounds` les réencode toutes en mp3 mono 44,1 kHz
-(`-q:a 5`) vers `public/sounds/`. Le mono suffit pour des échantillons de voix et
-divise le poids par deux.
+Safari et iOS ne lisent ni l'Ogg Vorbis ni le WebM. Les sources peuvent être dans
+n'importe quel format lisible par ffmpeg (mp3, ogg, wav, opus, m4a, flac, aac,
+webm) ; `make sounds` les réencode toutes en mp3 mono 44,1 kHz (`-q:a 5`) vers
+`public/sounds/`. Le mono suffit pour des échantillons de voix et divise le poids
+par deux.
 
 ---
 

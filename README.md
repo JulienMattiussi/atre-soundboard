@@ -1,8 +1,8 @@
 # atre-soundboard
 
 Soundboard 100% front-end : une grille de pads qui déclenche des échantillons
-audio à la souris, au doigt ou au clavier. Chaque pad montre le son en train de
-jouer et peut se superposer à lui-même.
+audio à la souris, au doigt ou au clavier. Le pad se remplit de sa couleur
+pendant la lecture ; un second appui coupe le son.
 
 React 19 + TypeScript, Vite, Tailwind CSS v4, Web Audio API, Vitest.
 

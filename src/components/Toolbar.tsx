@@ -1,18 +1,18 @@
 type ToolbarProps = {
   volume: number
   onVolumeChange: (value: number) => void
-  activeVoices: number
+  playingCount: number
   onStopAll: () => void
 }
 
-export function Toolbar({ volume, onVolumeChange, activeVoices, onStopAll }: ToolbarProps) {
+export function Toolbar({ volume, onVolumeChange, playingCount, onStopAll }: ToolbarProps) {
   return (
     <div className="flex shrink-0 items-center gap-3 sm:gap-4">
       <label className="flex items-center gap-2">
         <span className="sr-only">Volume général</span>
         <svg
           viewBox="0 0 16 16"
-          className="size-3.5 shrink-0 text-muted"
+          className="size-4 shrink-0 text-muted sm:size-5"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.4"
@@ -35,9 +35,22 @@ export function Toolbar({ volume, onVolumeChange, activeVoices, onStopAll }: Too
         />
       </label>
 
-      <button type="button" className="stop" onClick={onStopAll} disabled={activeVoices === 0}>
-        Stop
-        {activeVoices > 0 && <span className="text-ink">{activeVoices}</span>}
+      <button
+        type="button"
+        className="stop"
+        onClick={onStopAll}
+        disabled={playingCount === 0}
+        aria-label="Tout couper, touche Espace"
+      >
+        <span className="stop__word">Stop</span>
+        {playingCount > 0 && (
+          <span className="stop__count" aria-hidden="true">
+            {playingCount}
+          </span>
+        )}
+        <span className="keycap" aria-hidden="true">
+          Espace
+        </span>
       </button>
     </div>
   )

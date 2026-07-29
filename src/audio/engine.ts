@@ -2,7 +2,7 @@ import type { Sound } from '@/types'
 
 type EngineStatus = 'idle' | 'decoding' | 'ready' | 'error'
 
-export type EngineState = {
+type EngineState = {
   status: EngineStatus
   voices: Readonly<Record<string, number>>
   triggers: Readonly<Record<string, number>>
@@ -22,6 +22,7 @@ export class SoundboardEngine {
   private playing = new Map<string, Set<AudioBufferSourceNode>>()
   private listeners = new Set<Listener>()
   private prefetching: Promise<void> | null = null
+  private unlocking: Promise<void> | null = null
   private volume = 0.8
   private state: EngineState = IDLE_STATE
 
@@ -48,11 +49,12 @@ export class SoundboardEngine {
   }
 
   unlock = async (): Promise<void> => {
-    if (this.ctx) {
-      if (this.ctx.state === 'suspended') await this.ctx.resume()
-      return
-    }
+    this.unlocking ??= this.initialise()
+    await this.unlocking
+    if (this.ctx?.state === 'suspended') await this.ctx.resume()
+  }
 
+  private async initialise(): Promise<void> {
     try {
       this.ctx = new AudioContext()
       this.master = this.ctx.createGain()
@@ -68,7 +70,21 @@ export class SoundboardEngine {
     await this.decodeAll()
   }
 
-  play = (id: string): void => {
+  toggle = (id: string): void => {
+    if (this.playing.get(id)?.size) {
+      this.stop(id)
+      return
+    }
+    this.play(id)
+  }
+
+  private stop(id: string): void {
+    const voices = this.playing.get(id)
+    if (!voices) return
+    for (const source of [...voices]) source.stop()
+  }
+
+  private play(id: string): void {
     const ctx = this.ctx
     const buffer = this.buffers.get(id)
     if (!ctx || !this.master || !buffer) return
@@ -116,6 +132,7 @@ export class SoundboardEngine {
     void this.ctx?.close()
     this.ctx = null
     this.master = null
+    this.unlocking = null
     this.buffers.clear()
     this.playing.clear()
     this.state = IDLE_STATE

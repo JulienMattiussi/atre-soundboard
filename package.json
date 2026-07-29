@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "description": "Soundboard 100% front-end : une grille de pads déclenchés à la souris, au doigt ou au clavier.",
+  "author": "YavaDeus",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
