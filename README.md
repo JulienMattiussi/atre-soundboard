@@ -10,7 +10,7 @@ Grille de pads, un son par pad. Clique, tape la touche, ou touche l'écran.
 Le pad se remplit de sa couleur pendant toute la durée de l'échantillon.
 100% front-end, zéro backend, zéro dépendance en dehors de React.
 
-**[atre-soundboard.vercel.app](https://atre-soundboard.vercel.app)**
+**[atre-soundboard.yavadeus.dev](https://atre-soundboard.yavadeus.dev)**
 
 </div>
 
@@ -109,7 +109,7 @@ Site statique, aucune Function, aucune base, aucun secret. Sur Vercel il n'y a
 rien à configurer au-delà du framework détecté automatiquement.
 
 La production tourne sur
-[atre-soundboard.vercel.app](https://atre-soundboard.vercel.app). Cette origine
+[atre-soundboard.yavadeus.dev](https://atre-soundboard.yavadeus.dev). Cette origine
 est le défaut au build, et sert à construire l'URL canonique, l'image Open Graph
 et les données structurées. Pour déployer ailleurs, deux échappatoires, dans cet
 ordre de priorité : la variable `SITE_URL`, sinon

@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { resolve } from 'path'
 
 const PORT = 5050
-const PRODUCTION_URL = 'https://atre-soundboard.vercel.app'
+const PRODUCTION_URL = 'https://atre-soundboard.yavadeus.dev'
 
 /**
  * Absolute origin of the deployed site. Crawlers reject relative og:image URLs,

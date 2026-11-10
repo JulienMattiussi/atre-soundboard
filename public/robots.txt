@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://atre-soundboard.vercel.app/sitemap.xml
+Sitemap: https://atre-soundboard.yavadeus.dev/sitemap.xml
